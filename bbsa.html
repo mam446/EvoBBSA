@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bbsa &mdash; Evolving BBSAs 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Evolving BBSAs 1.0 documentation" href="index.html" />
+    <link rel="next" title="Nodes" href="nodes.html" />
+    <link rel="prev" title="Welcome to Evolving BBSAs’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="nodes.html" title="Nodes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Evolving BBSAs’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Evolving BBSAs 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-bbsa">
+<span id="bbsa"></span><h1>bbsa<a class="headerlink" href="#module-bbsa" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="bbsa.bbsa">
+<em class="property">class </em><tt class="descclassname">bbsa.</tt><tt class="descname">bbsa</tt><big>(</big><em>settings</em><big>)</big><a class="reference internal" href="_modules/bbsa.html#bbsa"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbsa.bbsa" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class is the black box search algorithm. It contains the parse tree which is used to 
+evaluate the bbsa.</p>
+<dl class="method">
+<dt id="bbsa.bbsa.altMutate">
+<tt class="descname">altMutate</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bbsa.html#bbsa.altMutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbsa.bbsa.altMutate" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a mutation that selects a random node and randomizes the parameters of that node.
+Note: not all nodes have parameters that can be altered.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbsa.bbsa.analyze">
+<tt class="descname">analyze</tt><big>(</big><em>logs</em><big>)</big><a class="reference internal" href="_modules/bbsa.html#bbsa.analyze"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbsa.bbsa.analyze" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is used to analyze the logs that are generated in the run function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbsa.bbsa.count">
+<tt class="descname">count</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bbsa.html#bbsa.count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbsa.bbsa.count" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function counts the number of nodes in the bbsa</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbsa.bbsa.createRandom">
+<tt class="descname">createRandom</tt><big>(</big><em>start=None</em><big>)</big><a class="reference internal" href="_modules/bbsa.html#bbsa.createRandom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbsa.bbsa.createRandom" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function creates a random tree bounded by 2^(max depth) nodes.
+Note: since the majority of nodes are unary nodes the actual depth of the trees
+may exceed the maximum depth.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbsa.bbsa.dominate">
+<tt class="descname">dominate</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="_modules/bbsa.html#bbsa.dominate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbsa.bbsa.dominate" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is/will be used to determin domination for a multi objective
+algorithm</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbsa.bbsa.duplicate">
+<tt class="descname">duplicate</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bbsa.html#bbsa.duplicate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbsa.bbsa.duplicate" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function creates a copy of itself and updates the newly created object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbsa.bbsa.evaluate">
+<tt class="descname">evaluate</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bbsa.html#bbsa.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbsa.bbsa.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function evaluates the bbsa by running it a user specified number of times.
+The average number of evaluations and the average best fitness found are stored
+for use in calculating the fitness.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbsa.bbsa.load">
+<tt class="descname">load</tt><big>(</big><em>prog</em>, <em>parent=None</em>, <em>i=0</em><big>)</big><a class="reference internal" href="_modules/bbsa.html#bbsa.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbsa.bbsa.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function loads a bbsa into the parse tree structure from a dictionary that can be generated by the toDict() function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbsa.bbsa.makeProg">
+<tt class="descname">makeProg</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bbsa.html#bbsa.makeProg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbsa.bbsa.makeProg" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function generates the code that is used for external verification. It generates code in a post-order fashion.
+This functions assumes that the structure of the algorithm has already been created</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbsa.bbsa.mate">
+<tt class="descname">mate</tt><big>(</big><em>other</em><big>)</big><a class="reference internal" href="_modules/bbsa.html#bbsa.mate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbsa.bbsa.mate" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the standard sub-tree crossover. This operation does not strictly keep the max
+depth that is set in the settings file. Meaning the resulting tree(s)&#8217; depth may exceed
+the maximum depth.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbsa.bbsa.mutate">
+<tt class="descname">mutate</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bbsa.html#bbsa.mutate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbsa.bbsa.mutate" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the a sub-tree mutation where the amount of nodes added is bounded by a user defined value. This operation does not strictly keep the max
+depth that is set in the settings file. Meaning the resulting tree&#8217;s depth may exceed
+the maximum depth.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbsa.bbsa.randomNode">
+<tt class="descname">randomNode</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bbsa.html#bbsa.randomNode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbsa.bbsa.randomNode" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns a random node in the parse tree.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbsa.bbsa.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bbsa.html#bbsa.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbsa.bbsa.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function performs one run of the bbsa.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbsa.bbsa.toDict">
+<tt class="descname">toDict</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bbsa.html#bbsa.toDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbsa.bbsa.toDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function creates a dictionary which can be used by the load function to create a copy. This is done so that
+tree&#8217;s can be saved and loaded from disk.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="bbsa.bbsa.update">
+<tt class="descname">update</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/bbsa.html#bbsa.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbsa.bbsa.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function updates all of the nodes with the correct pointers to the settings and the persistant and &#8216;last&#8217; sets.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="bbsa.popNodes">
+<tt class="descclassname">bbsa.</tt><tt class="descname">popNodes</tt><big>(</big><em>node</em>, <em>a</em><big>)</big><a class="reference internal" href="_modules/bbsa.html#popNodes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#bbsa.popNodes" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is used to create a list of all nodes in a given bbsa. The list will be in pre order.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to Evolving BBSAs&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="nodes.html"
+                        title="next chapter">Nodes</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/bbsa.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="nodes.html" title="Nodes"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Evolving BBSAs’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">Evolving BBSAs 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Matthew A. Martin.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

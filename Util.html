@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Utilities &mdash; Evolving BBSAs 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Evolving BBSAs 1.0 documentation" href="index.html" />
+    <link rel="next" title="Settings" href="settings.html" />
+    <link rel="prev" title="Solution Fitness Function" href="FitnessFunction.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="settings.html" title="Settings"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="FitnessFunction.html" title="Solution Fitness Function"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Evolving BBSAs 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-Util">
+<span id="utilities"></span><h1>Utilities<a class="headerlink" href="#module-Util" title="Permalink to this headline">¶</a></h1>
+<p>Module containing a host of useful functions that do not fall into more
+explicit categories.</p>
+<dl class="function">
+<dt id="Util.binaryCounter">
+<tt class="descclassname">Util.</tt><tt class="descname">binaryCounter</tt><big>(</big><em>bits</em><big>)</big><a class="reference internal" href="_modules/Util.html#binaryCounter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Util.binaryCounter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a generator that will count through all possible values for a set
+number of bits.  Returned in counting order.  For instance,
+<tt class="docutils literal"><span class="pre">binaryCounter(3)</span></tt> will yield, 000, 001, 010, 011 ... 110, 111.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">bits</span></tt> The number of bits in the binary counter.</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="Util.classMethods">
+<tt class="descclassname">Util.</tt><tt class="descname">classMethods</tt><big>(</big><em>classType</em><big>)</big><a class="reference internal" href="_modules/Util.html#classMethods"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Util.classMethods" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a class type, return a dictionary mapping string names of that
+class&#8217;s methods to the actual method.  For instance
+<tt class="docutils literal"><span class="pre">classMethod(LTGA)['twoParentCrossover']</span></tt> will return the
+<tt class="docutils literal"><span class="pre">twoParentCrossover</span></tt> function.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">classType</span></tt>: Specifies what class to retrieve methods for.</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="Util.loadConfiguration">
+<tt class="descclassname">Util.</tt><tt class="descname">loadConfiguration</tt><big>(</big><em>filename</em>, <em>fileMethod=&lt;built-in function open&gt;</em><big>)</big><a class="reference internal" href="_modules/Util.html#loadConfiguration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Util.loadConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads a json from the given file name.  Optional file method allows for
+compressed files.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">filename</span></tt>: The relative path to the file to be loaded.</li>
+<li><tt class="docutils literal"><span class="pre">fileMethod</span></tt>: Handler to use to open the file.  Defaults to regular
+open.</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="Util.loadConfigurations">
+<tt class="descclassname">Util.</tt><tt class="descname">loadConfigurations</tt><big>(</big><em>filenames</em>, <em>fileMethod=&lt;built-in function open&gt;</em><big>)</big><a class="reference internal" href="_modules/Util.html#loadConfigurations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Util.loadConfigurations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a list of file names, create a single dictionary containing all of
+their contents.  Repeated keywords will override previously encountered
+values.  Optional file method allows for
+compressed files.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">filenames</span></tt>: A list of relative paths to the files to be loaded.</li>
+<li><tt class="docutils literal"><span class="pre">fileMethod</span></tt>: Handler to use to open the file.  Defaults to regular
+open.</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="Util.meanstd">
+<tt class="descclassname">Util.</tt><tt class="descname">meanstd</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/Util.html#meanstd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Util.meanstd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the mean and standard deviation of the given data.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">data</span></tt>: The data to find the mean and standard deviation of.</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="Util.median">
+<tt class="descclassname">Util.</tt><tt class="descname">median</tt><big>(</big><em>data</em>, <em>default=0</em><big>)</big><a class="reference internal" href="_modules/Util.html#median"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Util.median" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a data set, return the median value.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">data</span></tt>: The data to find the median of.</li>
+<li><tt class="docutils literal"><span class="pre">default</span></tt>: If <tt class="docutils literal"><span class="pre">data</span></tt> contains no information, what value should be
+returned.  Defaults to 0.</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="Util.moduleClasses">
+<tt class="descclassname">Util.</tt><tt class="descname">moduleClasses</tt><big>(</big><em>module</em><big>)</big><a class="reference internal" href="_modules/Util.html#moduleClasses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Util.moduleClasses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a module, return a dictionary mapping string names of that
+module&#8217;s classes to the actual classes.  For instance
+<tt class="docutils literal"><span class="pre">moduleClasses(FitnessFunction)['DeceptiveTrap']</span></tt> will return the
+<tt class="docutils literal"><span class="pre">DeceptiveTrap</span></tt> class.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">module</span></tt>: Specifies what module to retrieve classes for.</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="Util.randomBitString">
+<tt class="descclassname">Util.</tt><tt class="descname">randomBitString</tt><big>(</big><em>length</em><big>)</big><a class="reference internal" href="_modules/Util.html#randomBitString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Util.randomBitString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate and return a random list of 0s and 1s.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">length</span></tt>: The length of the list to be generated.</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="Util.saveConfiguration">
+<tt class="descclassname">Util.</tt><tt class="descname">saveConfiguration</tt><big>(</big><em>filename</em>, <em>data</em>, <em>fileMethod=&lt;built-in function open&gt;</em><big>)</big><a class="reference internal" href="_modules/Util.html#saveConfiguration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Util.saveConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes a block of json-able data to the specifed file path.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">filename</span></tt>: The relative path to the file to be written to.</li>
+<li><tt class="docutils literal"><span class="pre">data</span></tt>: Data that can be converted to a json.  IE dictionaries and
+lists.</li>
+<li><tt class="docutils literal"><span class="pre">fileMethod</span></tt>: Handler to use to open the file.  Defaults to regular
+open.</li>
+</ul>
+</dd></dl>
+
+<dl class="function">
+<dt id="Util.saveList">
+<tt class="descclassname">Util.</tt><tt class="descname">saveList</tt><big>(</big><em>filename</em>, <em>data</em><big>)</big><a class="reference internal" href="_modules/Util.html#saveList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Util.saveList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write out a list of jsons in a more human readable way than
+<tt class="docutils literal"><span class="pre">saveConfiguration</span></tt>.</p>
+<p>Parameters:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">filename</span></tt>: The relative path to the file to be written to.</li>
+<li><tt class="docutils literal"><span class="pre">data</span></tt>: A list of json-able data to be written</li>
+</ul>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="FitnessFunction.html"
+                        title="previous chapter">Solution Fitness Function</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="settings.html"
+                        title="next chapter">Settings</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/Util.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="settings.html" title="Settings"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="FitnessFunction.html" title="Solution Fitness Function"
+             >previous</a> |</li>
+        <li><a href="index.html">Evolving BBSAs 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Matthew A. Martin.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,713 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bbsa &mdash; Evolving BBSAs 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Evolving BBSAs 1.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Evolving BBSAs 1.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for bbsa</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">solution</span>
+
+<span class="kn">import</span> <span class="nn">termNodes</span>
+<span class="kn">import</span> <span class="nn">setNodes</span>
+<span class="kn">import</span> <span class="nn">alterNodes</span>
+<span class="kn">import</span> <span class="nn">selectNodes</span>
+<span class="kn">import</span> <span class="nn">evalNodes</span>
+<span class="kn">import</span> <span class="nn">listComp</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="n">allNodes</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">allNodes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">setNodes</span><span class="o">.</span><span class="n">setNodes</span><span class="p">)</span>
+<span class="n">allNodes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">evalNodes</span><span class="o">.</span><span class="n">evalNodes</span><span class="p">)</span>
+<span class="n">allNodes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">alterNodes</span><span class="o">.</span><span class="n">alterNodes</span><span class="p">)</span>
+<span class="n">allNodes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">selectNodes</span><span class="o">.</span><span class="n">selectNodes</span><span class="p">)</span>
+<span class="c">#allNodes.extend(listComp.listCompNodes)</span>
+
+
+<div class="viewcode-block" id="popNodes"><a class="viewcode-back" href="../bbsa.html#bbsa.popNodes">[docs]</a><span class="k">def</span> <span class="nf">popNodes</span><span class="p">(</span><span class="n">node</span><span class="p">,</span><span class="n">a</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function is used to create a list of all nodes in a given bbsa. The list will be in pre order.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">down</span><span class="p">:</span>
+        <span class="n">popNodes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">a</span><span class="p">)</span>
+
+
+
+</div>
+<div class="viewcode-block" id="bbsa"><a class="viewcode-back" href="../bbsa.html#bbsa.bbsa">[docs]</a><span class="k">class</span> <span class="nc">bbsa</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is the black box search algorithm. It contains the parse tree which is used to </span>
+<span class="sd">    evaluate the bbsa.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">settings</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructor for the bbsa</span>
+<span class="sd">        defaults all of the values and sets the values that are contained in the settings file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aveOps</span> <span class="o">=</span> <span class="mf">0.0</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxDepth</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">maxDepth</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">maxIterations</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">maxIterations</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">converge</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">converge</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">initPop</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">settings</span><span class="o">.</span><span class="n">initPop</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="mi">0</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">sets</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;last&#39;</span><span class="p">:[],</span><span class="s">&#39;empty&#39;</span><span class="p">:[],</span><span class="s">&#39;pers&#39;</span><span class="p">:{}}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">settings</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logs</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">numRuns</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">numRuns</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">aveBest</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aveEval</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">createRandom</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;bbsa&quot;</span>
+
+<div class="viewcode-block" id="bbsa.makeProg"><a class="viewcode-back" href="../bbsa.html#bbsa.bbsa.makeProg">[docs]</a>    <span class="k">def</span> <span class="nf">makeProg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function generates the code that is used for external verification. It generates code in a post-order fashion.</span>
+<span class="sd">        This functions assumes that the structure of the algorithm has already been created</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tab</span> <span class="o">=</span> <span class="s">&quot;    &quot;</span>
+        <span class="n">indent</span> <span class="o">=</span> <span class="n">tab</span><span class="o">*</span><span class="mi">2</span>
+        <span class="n">prog</span> <span class="o">=</span> <span class="s">&quot;import solution </span><span class="se">\n</span><span class="s">import random</span><span class="se">\n</span><span class="s">import settings</span><span class="se">\n</span><span class="s">import logger</span><span class="se">\n</span><span class="s">&quot;</span>
+        <span class="n">prog</span><span class="o">+=</span><span class="s">&quot;from funcs import *</span><span class="se">\n</span><span class="s">&quot;</span>
+        
+        <span class="n">prog</span><span class="o">+=</span><span class="s">&quot;&quot;&quot;def kTourn(pop,k):</span>
+
+<span class="s">    best = None</span>
+<span class="s">    for i in xrange(k):</span>
+<span class="s">        obj = random.choice(pop)</span>
+<span class="s">        if not best or obj&gt;best:</span>
+<span class="s">            best = obj</span>
+<span class="s">    return best&quot;&quot;&quot;</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n\n</span><span class="s">&quot;</span>
+        <span class="n">prog</span><span class="o">+=</span> <span class="s">&quot;</span><span class="se">\&quot;\&quot;\&quot;</span><span class="s">&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toDict</span><span class="p">())</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\&quot;\&quot;\&quot;\n\n</span><span class="s">&quot;</span>
+        <span class="n">prog</span><span class="o">+=</span><span class="s">&quot;</span><span class="se">\&quot;\&quot;\&quot;</span><span class="s">&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aveBest</span><span class="p">)</span><span class="o">+</span><span class="s">&quot; &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aveEval</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\&quot;\&quot;\&quot;\n\n</span><span class="s">&quot;</span>
+        <span class="n">prog</span><span class="o">+=</span><span class="s">&quot;</span><span class="se">\&quot;\&quot;\&quot;</span><span class="s">&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\&quot;\&quot;\&quot;\n</span><span class="s">&quot;</span>
+        <span class="n">prog</span> <span class="o">+=</span> <span class="s">&quot;def run(name=</span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\&quot;</span><span class="s">,numRuns=10):</span><span class="se">\n\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">tab</span>
+        <span class="n">prog</span> <span class="o">+=</span> <span class="s">&quot;l = logger.logger(name)</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">tab</span>
+        <span class="n">prog</span> <span class="o">+=</span> <span class="s">&quot;curRun = 0</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">tab</span>
+        <span class="n">prog</span> <span class="o">+=</span> <span class="s">&quot;for w in xrange(numRuns):</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span>
+        <span class="n">prog</span> <span class="o">+=</span> <span class="s">&quot;s = settings.settings()</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">problemType</span><span class="p">:</span>
+            <span class="n">prog</span> <span class="o">+=</span> <span class="s">&quot;s.problemType = </span><span class="se">\&quot;</span><span class="s">&quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">problemType</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\&quot;\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">prog</span> <span class="o">+=</span> <span class="s">&quot;s.problemType = </span><span class="se">\&quot;</span><span class="s">allOnes</span><span class="se">\&quot;\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span>
+        <span class="n">prog</span> <span class="o">+=</span> <span class="s">&quot;s.maxEvals = &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">maxEvals</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span>
+        <span class="n">prog</span> <span class="o">+=</span> <span class="s">&quot;s.maxIterations = &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">maxIterations</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span>
+        <span class="n">prog</span> <span class="o">+=</span> <span class="s">&quot;s.converge = &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">converge</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span>
+        <span class="n">prog</span> <span class="o">+=</span> <span class="s">&quot;s.numRuns = &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">numRuns</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span>
+        <span class="n">prog</span> <span class="o">+=</span> <span class="s">&quot;s.solSet[</span><span class="se">\&#39;</span><span class="s">length</span><span class="se">\&#39;</span><span class="s">] = &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">solSet</span><span class="p">[</span><span class="s">&#39;length&#39;</span><span class="p">])</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span>
+        <span class="n">prog</span> <span class="o">+=</span> <span class="s">&quot;s.initPop = &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initPop</span><span class="p">)</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span>
+        <span class="n">prog</span> <span class="o">+=</span> <span class="s">&quot;s.curEvals = 0&quot;</span><span class="o">+</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span>
+
+        <span class="n">prog</span> <span class="o">+=</span> <span class="s">&quot;last = [solution.solution(s) for x in xrange(s.initPop)]</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span>
+        <span class="n">prog</span> <span class="o">+=</span> <span class="s">&quot;for d in last:</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span><span class="o">+</span><span class="n">tab</span>
+        <span class="n">prog</span> <span class="o">+=</span> <span class="s">&quot;d.evaluate()</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;pers&#39;</span><span class="p">]:</span>
+            <span class="n">prog</span><span class="o">+=</span> <span class="n">key</span><span class="o">+</span><span class="s">&quot;=[]</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span>
+        <span class="n">prog</span><span class="o">+=</span><span class="s">&quot;for it in xrange(s.maxIterations):</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span><span class="o">+</span><span class="n">tab</span>
+        <span class="n">prog</span><span class="o">+=</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">makeProg</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="s">&quot;0&quot;</span><span class="p">)</span>
+        <span class="n">prog</span><span class="o">+=</span><span class="s">&quot;last=x0</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span><span class="o">+</span><span class="n">tab</span>
+        <span class="n">prog</span><span class="o">+=</span><span class="s">&quot;l.newIter(last,s.curEvals)</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span><span class="o">+</span><span class="n">tab</span>
+        <span class="n">prog</span><span class="o">+=</span><span class="s">&quot;if s.curEvals&gt;=s.maxEvals:</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span><span class="o">+</span><span class="n">tab</span><span class="o">+</span><span class="n">tab</span>
+        <span class="n">prog</span><span class="o">+=</span><span class="s">&quot;break</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span>
+        <span class="n">prog</span><span class="o">+=</span><span class="s">&quot;for d in last:</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span><span class="o">+</span><span class="n">tab</span>
+        <span class="n">prog</span><span class="o">+=</span><span class="s">&quot;d.evaluate()</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span>
+        <span class="n">prog</span><span class="o">+=</span><span class="s">&quot;l.newIter(last,s.curEvals)</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">indent</span>
+        <span class="n">prog</span><span class="o">+=</span><span class="s">&quot;l.newRun()</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">tab</span>
+        <span class="n">prog</span><span class="o">+=</span><span class="s">&quot;l.log()</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">tab</span>
+        <span class="n">returnList</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;pers&#39;</span><span class="p">]:</span>
+            <span class="n">returnList</span><span class="o">+=</span><span class="s">&quot;,&quot;</span><span class="o">+</span><span class="n">key</span>
+        <span class="n">prog</span><span class="o">+=</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">tab</span><span class="o">+</span><span class="s">&quot;return {</span><span class="se">\&#39;</span><span class="s">sets</span><span class="se">\&#39;</span><span class="s">:[last&quot;</span><span class="o">+</span><span class="n">returnList</span><span class="o">+</span><span class="s">&quot;],</span><span class="se">\&#39;</span><span class="s">settings</span><span class="se">\&#39;</span><span class="s">:s}&quot;</span>
+        <span class="k">return</span> <span class="n">prog</span>
+
+</div>
+<div class="viewcode-block" id="bbsa.load"><a class="viewcode-back" href="../bbsa.html#bbsa.bbsa.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">prog</span><span class="p">,</span><span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function loads a bbsa into the parse tree structure from a dictionary that can be generated by the toDict() function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span><span class="bp">None</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">prog</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">prog</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">prog</span> 
+        <span class="n">cur</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">key</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;evalu&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">parent</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">evalNodes</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">evalNodes</span><span class="o">.</span><span class="n">eval</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">prog</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">cur</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">key</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;addSe&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">parent</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">setNodes</span><span class="o">.</span><span class="n">addSet</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">setNodes</span><span class="o">.</span><span class="n">addSet</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">prog</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">cur</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">prog</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span><span class="n">cur</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">key</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;makeS&#39;</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&#39;.*\{(.*)\}.*&#39;</span><span class="p">,</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">parent</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">setNodes</span><span class="o">.</span><span class="n">makeSet</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">setNodes</span><span class="o">.</span><span class="n">makeSet</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">prog</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">cur</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+            
+        <span class="k">elif</span> <span class="n">key</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;mutat&#39;</span><span class="p">:</span>
+            <span class="n">rate</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&#39;.*\((.*)\).*&#39;</span><span class="p">,</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">parent</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">alterNodes</span><span class="o">.</span><span class="n">mutate</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">rate</span> <span class="o">=</span> <span class="n">rate</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">alterNodes</span><span class="o">.</span><span class="n">mutate</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">rate</span> <span class="o">=</span> <span class="n">rate</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">prog</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">cur</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">key</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;uniRe&#39;</span><span class="p">:</span>
+            <span class="n">num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&#39;.*count\=([0-9]*).*&#39;</span><span class="p">,</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">parent</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">alterNodes</span><span class="o">.</span><span class="n">uniRecomb</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">num</span> <span class="o">=</span> <span class="n">num</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">alterNodes</span><span class="o">.</span><span class="n">uniRecomb</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">num</span> <span class="o">=</span> <span class="n">num</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">prog</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">cur</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        
+        <span class="k">elif</span> <span class="n">key</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;diago&#39;</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&#39;.*n\=([0-9]*).*&#39;</span><span class="p">,</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">parent</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">alterNodes</span><span class="o">.</span><span class="n">diagRecomb</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">num</span> <span class="o">=</span> <span class="n">n</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">alterNodes</span><span class="o">.</span><span class="n">diagRecomb</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">prog</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">cur</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">key</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;tweak&#39;</span><span class="p">:</span>
+            <span class="n">num</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&#39;.*\((.*)\).*&#39;</span><span class="p">,</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">parent</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">alterNodes</span><span class="o">.</span><span class="n">tweak</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">rate</span> <span class="o">=</span> <span class="n">rate</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">alterNodes</span><span class="o">.</span><span class="n">tweak</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">rate</span> <span class="o">=</span> <span class="n">rate</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">prog</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">cur</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">key</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;kTour&#39;</span><span class="p">:</span>
+            <span class="n">num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&#39;.*count=([0-9]*).*&#39;</span><span class="p">,</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&#39;.*k=([0-9]*).*&#39;</span><span class="p">,</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">parent</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">selectNodes</span><span class="o">.</span><span class="n">kTourn</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">num</span> <span class="o">=</span> <span class="n">num</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">selectNodes</span><span class="o">.</span><span class="n">kTourn</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">num</span> <span class="o">=</span> <span class="n">num</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span class="n">k</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">prog</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">cur</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">key</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;trunc&#39;</span><span class="p">:</span>
+            <span class="n">num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&#39;.*count=([0-9]*).*&#39;</span><span class="p">,</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">parent</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">selectNodes</span><span class="o">.</span><span class="n">trunc</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">num</span> <span class="o">=</span> <span class="n">num</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">selectNodes</span><span class="o">.</span><span class="n">trunc</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">num</span> <span class="o">=</span> <span class="n">num</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">prog</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">cur</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+
+
+        <span class="k">elif</span> <span class="n">key</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;[Last&#39;</span><span class="p">:</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">parent</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">termNodes</span><span class="o">.</span><span class="n">lastSet</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">termNodes</span><span class="o">.</span><span class="n">lastSet</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&#39;\[(.*)\]&#39;</span><span class="p">,</span><span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">parent</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">termNodes</span><span class="o">.</span><span class="n">persSet</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">termNodes</span><span class="o">.</span><span class="n">persSet</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+                <span class="n">parent</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span> 
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">parent</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">()</span></div>
+<div class="viewcode-block" id="bbsa.update"><a class="viewcode-back" href="../bbsa.html#bbsa.bbsa.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function updates all of the nodes with the correct pointers to the settings and the persistant and &#39;last&#39; sets.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="bbsa.count"><a class="viewcode-back" href="../bbsa.html#bbsa.bbsa.count">[docs]</a>    <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function counts the number of nodes in the bbsa</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="bbsa.duplicate"><a class="viewcode-back" href="../bbsa.html#bbsa.bbsa.duplicate">[docs]</a>    <span class="k">def</span> <span class="nf">duplicate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function creates a copy of itself and updates the newly created object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">aveBest</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">aveEval</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">aveOps</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">logs</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">x</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;last&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;empty&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;pers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:[]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;pers&#39;</span><span class="p">]}</span>
+
+        <span class="n">x</span><span class="o">.</span><span class="n">runs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">x</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">curEvals</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">curOp</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">x</span>
+</div>
+<div class="viewcode-block" id="bbsa.randomNode"><a class="viewcode-back" href="../bbsa.html#bbsa.bbsa.randomNode">[docs]</a>    <span class="k">def</span> <span class="nf">randomNode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function returns a random node in the parse tree.</span>
+<span class="sd">        &quot;&quot;&quot;</span> 
+        <span class="n">z</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">popNodes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">n</span>
+       </div>
+<div class="viewcode-block" id="bbsa.altMutate"><a class="viewcode-back" href="../bbsa.html#bbsa.bbsa.altMutate">[docs]</a>    <span class="k">def</span> <span class="nf">altMutate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is a mutation that selects a random node and randomizes the parameters of that node.</span>
+<span class="sd">        Note: not all nodes have parameters that can be altered.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duplicate</span><span class="p">()</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">randomNode</span><span class="p">()</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">randomize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>   
+        <span class="k">return</span> <span class="n">x</span>
+
+</div>
+<div class="viewcode-block" id="bbsa.mate"><a class="viewcode-back" href="../bbsa.html#bbsa.bbsa.mate">[docs]</a>    <span class="k">def</span> <span class="nf">mate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span>
+        
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duplicate</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">duplicate</span><span class="p">()</span>
+
+        <span class="n">xn</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">randomNode</span><span class="p">()</span>
+        <span class="n">yn</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">randomNode</span><span class="p">()</span>
+
+        <span class="n">xp</span> <span class="o">=</span> <span class="n">xn</span><span class="o">.</span><span class="n">parent</span>
+        <span class="n">yp</span> <span class="o">=</span> <span class="n">yn</span><span class="o">.</span><span class="n">parent</span>
+        <span class="k">if</span> <span class="n">yp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">yn</span><span class="o">==</span><span class="n">yp</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">yp</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">xn</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">yp</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">xn</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">y</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">xn</span>
+        <span class="k">if</span> <span class="n">xp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">xn</span><span class="o">==</span><span class="n">xp</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">xp</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">yn</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">xp</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">yn</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">yn</span>
+        <span class="n">xn</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">yp</span>
+        <span class="n">yn</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">xp</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="n">y</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="n">y</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> 
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span> 
+</div>
+<div class="viewcode-block" id="bbsa.mutate"><a class="viewcode-back" href="../bbsa.html#bbsa.bbsa.mutate">[docs]</a>    <span class="k">def</span> <span class="nf">mutate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duplicate</span><span class="p">()</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">randomNode</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">createRandom</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">x</span>
+
+
+</div>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="n">string</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">toString</span><span class="p">()</span> 
+        <span class="k">return</span> <span class="n">string</span>
+
+
+<div class="viewcode-block" id="bbsa.toDict"><a class="viewcode-back" href="../bbsa.html#bbsa.bbsa.toDict">[docs]</a>    <span class="k">def</span> <span class="nf">toDict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">toDict</span><span class="p">()</span>
+
+
+</div>
+<div class="viewcode-block" id="bbsa.createRandom"><a class="viewcode-back" href="../bbsa.html#bbsa.bbsa.createRandom">[docs]</a>    <span class="k">def</span> <span class="nf">createRandom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">start</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maxDepth</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">start</span><span class="o">==</span><span class="bp">None</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">size</span><span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">maxDepth</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">allNodes</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">start</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">node</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+                <span class="n">start</span><span class="o">.</span><span class="n">randomize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">last</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="n">start</span>
+            <span class="k">while</span> <span class="n">cur</span><span class="p">:</span>
+                <span class="n">last</span> <span class="o">=</span> <span class="n">cur</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">cur</span><span class="o">.</span><span class="n">down</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">cur</span><span class="o">.</span><span class="n">down</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cur</span><span class="o">==</span><span class="n">last</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="n">last</span>
+            
+            <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cur</span><span class="o">.</span><span class="n">down</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">cur</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">cur</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                     <span class="n">n</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">cur</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">n</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">n</span><span class="o">==</span><span class="bp">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c">#eventually need checks here to make sure valid children</span>
+            <span class="c">#and values get set right in the children</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">node</span><span class="p">(</span><span class="n">cur</span><span class="p">)</span>
+            <span class="k">if</span> <span class="mi">2</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cur</span><span class="o">.</span><span class="n">take</span><span class="p">:</span>
+                <span class="k">if</span> <span class="mi">1</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">give</span><span class="p">:</span>
+                    <span class="n">t</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">t</span><span class="o">.</span><span class="n">randomize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+                    <span class="n">t</span><span class="o">.</span><span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">cur</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cur</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span>
+                <span class="n">cur</span><span class="o">.</span><span class="n">down</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">.</span><span class="n">randomize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="n">start</span><span class="o">.</span><span class="n">fillTerms</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="n">start</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">start</span>       
+            <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="k">return</span>
+
+
+    
+
+</div>
+<div class="viewcode-block" id="bbsa.evaluate"><a class="viewcode-back" href="../bbsa.html#bbsa.bbsa.evaluate">[docs]</a>    <span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logs</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:[]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;pers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">[</span><span class="s">&#39;last&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;last&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">solution</span><span class="o">.</span><span class="n">solution</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="p">)</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initPop</span><span class="p">)]</span> 
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;last&#39;</span><span class="p">]:</span>
+            <span class="n">d</span><span class="o">.</span><span class="n">evaluate</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">curOp</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">curEvals</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maxIterations</span><span class="p">):</span>
+            
+            <span class="n">gMax</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">temp</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;last&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="s">&#39;last&#39;</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;pers&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]:</span>
+                    <span class="n">s</span><span class="o">+=</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span>
+                    <span class="k">if</span> <span class="n">m</span><span class="o">&lt;</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span><span class="p">:</span>
+                        <span class="n">m</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">fitness</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;pers&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">s</span><span class="o">/=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;pers&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">])</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;pers&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]:</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">curEvals</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">s</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">m</span><span class="o">&gt;</span><span class="n">gMax</span><span class="p">:</span>
+                        <span class="n">gMax</span> <span class="o">=</span> <span class="n">m</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;last&#39;</span><span class="p">]:</span>
+                <span class="n">s</span><span class="o">+=</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span>
+                <span class="k">if</span> <span class="n">m</span><span class="o">&lt;</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span><span class="p">:</span>
+                    <span class="n">m</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">fitness</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;last&#39;</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">s</span><span class="o">/=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;last&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;last&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">m</span><span class="o">&gt;</span><span class="n">gMax</span><span class="p">:</span>
+                    <span class="n">gMax</span> <span class="o">=</span> <span class="n">m</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">[</span><span class="s">&#39;last&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">curEvals</span><span class="p">),</span><span class="n">m</span><span class="p">,</span><span class="n">s</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">curOp</span><span class="p">))</span>
+            
+            
+            <span class="k">if</span> <span class="n">i</span><span class="o">&gt;</span><span class="bp">self</span><span class="o">.</span><span class="n">converge</span> <span class="ow">and</span> <span class="n">gMax</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="k">break</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">curEvals</span><span class="o">&gt;=</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">maxEvals</span><span class="p">:</span>
+                <span class="k">break</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">curOp</span><span class="o">&gt;=</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">maxOp</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="n">gMax</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="s">&#39;last&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;pers&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]:</span>
+                <span class="n">s</span><span class="o">+=</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span>
+                <span class="k">if</span> <span class="n">m</span><span class="o">&lt;</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span><span class="p">:</span>
+                    <span class="n">m</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">fitness</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;pers&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">s</span><span class="o">/=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;pers&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">])</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">curEvals</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">s</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">m</span><span class="o">&gt;</span><span class="n">gMax</span><span class="p">:</span>
+                <span class="n">gMax</span> <span class="o">=</span> <span class="n">m</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="n">it</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;last&#39;</span><span class="p">]:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">evaluate</span><span class="p">()</span>
+            <span class="n">s</span><span class="o">+=</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span>
+            <span class="k">if</span> <span class="n">m</span><span class="o">&lt;</span><span class="n">x</span><span class="o">.</span><span class="n">fitness</span><span class="p">:</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">fitness</span>
+                <span class="n">it</span> <span class="o">=</span> <span class="n">k</span>
+            <span class="n">k</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;last&#39;</span><span class="p">])</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">s</span><span class="o">/=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;last&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">m</span><span class="o">&gt;</span><span class="n">gMax</span><span class="p">:</span>
+            <span class="n">gMax</span> <span class="o">=</span> <span class="n">m</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">[</span><span class="s">&#39;last&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">curEvals</span><span class="p">),</span><span class="n">m</span><span class="p">,</span><span class="n">s</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">curOp</span><span class="p">))</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">curEvals</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">curOp</span>
+</div>
+<div class="viewcode-block" id="bbsa.run"><a class="viewcode-back" href="../bbsa.html#bbsa.bbsa.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numRuns</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">aveOps</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">runs</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s">&#39;logs&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">,</span><span class="s">&#39;analyze&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">)})</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;pers&#39;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;pers&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sets</span><span class="p">[</span><span class="s">&#39;last&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c">#generalize how good the runs were</span>
+        <span class="c">#give it a fitness here</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aveOps</span> <span class="o">/=</span><span class="bp">self</span><span class="o">.</span><span class="n">numRuns</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">aveBest</span> <span class="o">=</span> <span class="mf">0.0</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">aveEval</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">runs</span><span class="p">:</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">k</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">run</span><span class="p">[</span><span class="s">&#39;analyze&#39;</span><span class="p">][</span><span class="s">&#39;finalBest&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">b</span> <span class="ow">or</span> <span class="n">run</span><span class="p">[</span><span class="s">&#39;analyze&#39;</span><span class="p">][</span><span class="s">&#39;finalBest&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span><span class="o">&gt;</span><span class="n">b</span><span class="p">:</span>
+                    <span class="n">b</span> <span class="o">=</span> <span class="n">run</span><span class="p">[</span><span class="s">&#39;analyze&#39;</span><span class="p">][</span><span class="s">&#39;finalBest&#39;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="n">key</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">aveBest</span><span class="o">+=</span><span class="n">b</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">aveEval</span><span class="o">+=</span><span class="n">run</span><span class="p">[</span><span class="s">&#39;analyze&#39;</span><span class="p">][</span><span class="s">&#39;converge&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aveBest</span><span class="o">/=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aveEval</span><span class="o">/=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aveBest</span>
+</div>
+<div class="viewcode-block" id="bbsa.analyze"><a class="viewcode-back" href="../bbsa.html#bbsa.bbsa.analyze">[docs]</a>    <span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">logs</span><span class="p">):</span>
+        <span class="c">#extract important information out of a run here</span>
+
+        <span class="n">allBest</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">finalBest</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">finalAverage</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">evalConv</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">logs</span><span class="p">:</span>
+            <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">rb</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">for</span> <span class="n">gen</span> <span class="ow">in</span> <span class="n">logs</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">rb</span> <span class="ow">or</span> <span class="n">gen</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">!=</span><span class="n">rb</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+                    <span class="n">rb</span> <span class="o">=</span> <span class="n">gen</span>
+                    <span class="n">counter</span><span class="o">+=</span><span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">counter</span><span class="o">&gt;=</span><span class="bp">self</span><span class="o">.</span><span class="n">converge</span><span class="p">:</span>
+                        <span class="n">evalConv</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">gen</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">allBest</span> <span class="ow">or</span> <span class="n">gen</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">&gt;</span><span class="n">allBest</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+                    <span class="n">allBest</span> <span class="o">=</span> <span class="n">gen</span>
+            <span class="n">finalBest</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">logs</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">finalAverage</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">logs</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">evalConv</span><span class="p">:</span>
+                <span class="n">evalConv</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">logs</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;allBest&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">allBest</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;finalBest&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">finalBest</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;finalAverage&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">finalAverage</span>
+        <span class="n">ret</span><span class="p">[</span><span class="s">&#39;converge&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">evalConv</span> 
+        <span class="k">return</span> <span class="n">ret</span>
+
+
+</div>
+    <span class="k">def</span> <span class="nf">printLogs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> 
+        <span class="n">opt</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&quot;Which logs?&quot;</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">[</span><span class="n">opt</span><span class="p">]:</span>
+            <span class="k">print</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+
+    <span class="k">def</span> <span class="nf">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span>
+        <span class="n">mf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">aveBest</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">parsimony</span>
+        <span class="n">yf</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">aveBest</span><span class="o">-</span><span class="n">other</span><span class="o">.</span><span class="n">size</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">parsimony</span>
+        <span class="k">if</span> <span class="n">mf</span><span class="o">&gt;</span><span class="n">yf</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">elif</span> <span class="n">mf</span><span class="o">&lt;</span><span class="n">yf</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">aveEval</span><span class="o">&lt;</span><span class="n">other</span><span class="o">.</span><span class="n">aveEval</span>
+       
+<div class="viewcode-block" id="bbsa.dominate"><a class="viewcode-back" href="../bbsa.html#bbsa.bbsa.dominate">[docs]</a>    <span class="k">def</span> <span class="nf">dominate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">other</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aveBest</span><span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">aveBest</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">aveEval</span><span class="o">&lt;=</span><span class="n">other</span><span class="o">.</span><span class="n">aveEval</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">aveBest</span><span class="o">&gt;=</span><span class="n">other</span><span class="o">.</span><span class="n">aveBest</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">aveEval</span><span class="o">&lt;=</span><span class="n">other</span><span class="o">.</span><span class="n">aveEval</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="bp">False</span>
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">Evolving BBSAs 1.0 documentation</a> &raquo;</li>
+          <li><a href="index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Matthew A. Martin.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>

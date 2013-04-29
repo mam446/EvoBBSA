@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Set Nodes &mdash; Evolving BBSAs 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Evolving BBSAs 1.0 documentation" href="index.html" />
+    <link rel="up" title="Nodes" href="nodes.html" />
+    <link rel="next" title="Alter Nodes" href="alterNodes.html" />
+    <link rel="prev" title="Nodes" href="nodes.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="alterNodes.html" title="Alter Nodes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="nodes.html" title="Nodes"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Evolving BBSAs 1.0 documentation</a> &raquo;</li>
+          <li><a href="nodes.html" accesskey="U">Nodes</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-setNodes">
+<span id="set-nodes"></span><h1>Set Nodes<a class="headerlink" href="#module-setNodes" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="setNodes.addSet">
+<em class="property">class </em><tt class="descclassname">setNodes.</tt><tt class="descname">addSet</tt><big>(</big><em>parent</em><big>)</big><a class="reference internal" href="_modules/setNodes.html#addSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setNodes.addSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>This node takes the Union of two sets and returns the resulting set</p>
+<dl class="method">
+<dt id="setNodes.addSet.count">
+<tt class="descname">count</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/setNodes.html#addSet.count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setNodes.addSet.count" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the number of nodes below it and including itself</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setNodes.addSet.evaluate">
+<tt class="descname">evaluate</tt><big>(</big><em>sets</em><big>)</big><a class="reference internal" href="_modules/setNodes.html#addSet.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setNodes.addSet.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function evaluates the node and returns the resulting set</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setNodes.addSet.fillTerms">
+<tt class="descname">fillTerms</tt><big>(</big><em>sets</em>, <em>settings</em><big>)</big><a class="reference internal" href="_modules/setNodes.html#addSet.fillTerms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setNodes.addSet.fillTerms" title="Permalink to this definition">¶</a></dt>
+<dd><p>After the bbsa places all of the non-terminal nodes, this funciton is called
+to place the terminal nodes at the bottom of the parse tree</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setNodes.addSet.makeProg">
+<tt class="descname">makeProg</tt><big>(</big><em>numTab</em>, <em>var</em><big>)</big><a class="reference internal" href="_modules/setNodes.html#addSet.makeProg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setNodes.addSet.makeProg" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function generates the code for this node for the external verification</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setNodes.addSet.randomize">
+<tt class="descname">randomize</tt><big>(</big><em>sets</em>, <em>settings</em><big>)</big><a class="reference internal" href="_modules/setNodes.html#addSet.randomize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setNodes.addSet.randomize" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function randomizes the parameters of the node if there are any</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setNodes.addSet.toDict">
+<tt class="descname">toDict</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/setNodes.html#addSet.toDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setNodes.addSet.toDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is used to create a dictionary representaion of the bbsa</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setNodes.addSet.toString">
+<tt class="descname">toString</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/setNodes.html#addSet.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setNodes.addSet.toString" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is used to create a string representaion of the bbsa</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setNodes.addSet.update">
+<tt class="descname">update</tt><big>(</big><em>depth</em>, <em>sets</em>, <em>settings</em><big>)</big><a class="reference internal" href="_modules/setNodes.html#addSet.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setNodes.addSet.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function updates the heights and depths and ensures
+that the settings pointer is pointing to the right settings 
+object</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="setNodes.makeSet">
+<em class="property">class </em><tt class="descclassname">setNodes.</tt><tt class="descname">makeSet</tt><big>(</big><em>parent</em><big>)</big><a class="reference internal" href="_modules/setNodes.html#makeSet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setNodes.makeSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>This node saves a snapshot of the set that is passed into it</p>
+<dl class="method">
+<dt id="setNodes.makeSet.count">
+<tt class="descname">count</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/setNodes.html#makeSet.count"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setNodes.makeSet.count" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function calculates the number of nodes below it and including itself</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setNodes.makeSet.evaluate">
+<tt class="descname">evaluate</tt><big>(</big><em>sets</em><big>)</big><a class="reference internal" href="_modules/setNodes.html#makeSet.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setNodes.makeSet.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function evaluates the node and returns the resulting set</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setNodes.makeSet.fillTerms">
+<tt class="descname">fillTerms</tt><big>(</big><em>sets</em>, <em>settings</em><big>)</big><a class="reference internal" href="_modules/setNodes.html#makeSet.fillTerms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setNodes.makeSet.fillTerms" title="Permalink to this definition">¶</a></dt>
+<dd><p>After the bbsa places all of the non-terminal nodes, this funciton is called
+to place the terminal nodes at the bottom of the parse tree</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setNodes.makeSet.makeProg">
+<tt class="descname">makeProg</tt><big>(</big><em>numTab</em>, <em>var</em><big>)</big><a class="reference internal" href="_modules/setNodes.html#makeSet.makeProg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setNodes.makeSet.makeProg" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function generates the code for this node for the external verification</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setNodes.makeSet.randomize">
+<tt class="descname">randomize</tt><big>(</big><em>sets</em>, <em>settings</em><big>)</big><a class="reference internal" href="_modules/setNodes.html#makeSet.randomize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setNodes.makeSet.randomize" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function randomizes the parameters of the node if there are any</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setNodes.makeSet.toDict">
+<tt class="descname">toDict</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/setNodes.html#makeSet.toDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setNodes.makeSet.toDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is used to create a dictionary representaion of the bbsa</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setNodes.makeSet.toString">
+<tt class="descname">toString</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/setNodes.html#makeSet.toString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setNodes.makeSet.toString" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is used to create a string representaion of the bbsa</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setNodes.makeSet.update">
+<tt class="descname">update</tt><big>(</big><em>depth</em>, <em>sets</em>, <em>settings</em><big>)</big><a class="reference internal" href="_modules/setNodes.html#makeSet.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#setNodes.makeSet.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function updates the heights and depths and ensures
+that the settings pointer is pointing to the right settings 
+object</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="nodes.html"
+                        title="previous chapter">Nodes</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="alterNodes.html"
+                        title="next chapter">Alter Nodes</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/setNodes.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="alterNodes.html" title="Alter Nodes"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="nodes.html" title="Nodes"
+             >previous</a> |</li>
+        <li><a href="index.html">Evolving BBSAs 1.0 documentation</a> &raquo;</li>
+          <li><a href="nodes.html" >Nodes</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Matthew A. Martin.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
+    </div>
+  </body>
+</html>
