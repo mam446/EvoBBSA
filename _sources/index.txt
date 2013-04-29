@@ -19,7 +19,6 @@ Contents:
    settings.rst
    funcs.rst      
 
-   Downloads <http://mst.edu/~mam446/EvoBBSA/Downloads>
 
 Indices and tables
 ==================
@@ -34,7 +33,7 @@ Downloads
 .. toctree::
   :maxdepth: 2
    
-  V1.0 <http://mst.edu/~mam446/EvoBBSA/Downloads/V1.zip>
+  V1.0 <http://github.com/mam446/EvoBBSA>
 
 
 
